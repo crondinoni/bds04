@@ -67,7 +67,7 @@ public class EventControllerIT {
 	@Test
 	public void insertShouldInsertResourceWhenClientLoggedAndCorrectData() throws Exception {
 
-		String accessToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientPassword);
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, adminUsername, adminPassword);
 		LocalDate nextMonth = LocalDate.now().plusMonths(1L);
 		
 		EventDTO dto = new EventDTO(null, "Expo XP", nextMonth, "https://expoxp.com.br", 1L);
@@ -178,10 +178,18 @@ public class EventControllerIT {
 	@Test
 	public void findAllShouldReturnPagedResources() throws Exception {
 		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientPassword);
+
+		EventDTO dto = new EventDTO();
+		String jsonBody = objectMapper.writeValueAsString(dto);
+		
 		ResultActions result =
 				mockMvc.perform(get("/events")
-					.contentType(MediaType.APPLICATION_JSON));
-
+						.header("Authorization", "Bearer " + accessToken)
+						.content(jsonBody)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON));
+		
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("$.content").exists());
 	}	

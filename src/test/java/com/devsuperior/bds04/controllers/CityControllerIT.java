@@ -123,9 +123,17 @@ public class CityControllerIT {
 	@Test
 	public void findAllShouldReturnAllResourcesSortedByName() throws Exception {
 		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, adminUsername, adminPassword);
+		
+		CityDTO dto = new CityDTO(null, "    ");
+		String jsonBody = objectMapper.writeValueAsString(dto);
+		
 		ResultActions result =
 				mockMvc.perform(get("/cities")
-					.contentType(MediaType.APPLICATION_JSON));
+						.header("Authorization", "Bearer " + accessToken)
+						.content(jsonBody)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON));
 
 		result.andExpect(status().isOk());
 		result.andExpect(jsonPath("$[0].name").value("Belo Horizonte"));
